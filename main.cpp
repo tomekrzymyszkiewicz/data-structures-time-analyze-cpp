@@ -21,11 +21,15 @@ string results_file_name = "";
 class Stack
 {
     private:
-        int *num = new int[10000000];
+        int *num;
         int top;
     public:
         Stack(){
             top=-1;
+            num = new int[10000000];
+        }
+        ~Stack(){
+            delete[] num;
         }
         int push(int n){
             if(isFull()){
@@ -245,19 +249,19 @@ void stack_operations(int size_of_stack){
     bool found = false;
     t_start = high_resolution_clock::now();
     int temp_stack_deep = 0;
-    Stack temp_stack = Stack();
+    Stack temp_search_stack = Stack();
     for(int i = 0; i < size_of_stack; i++){
         if(test_stack.peek() == data_vector[i]){
             t_end = high_resolution_clock::now();
             found = true;
             break;
         }else{
-            temp_stack.push(test_stack.pop());
+            temp_search_stack.push(test_stack.pop());
             temp_stack_deep++;
         }
     }
     for(int i = 0; i < temp_stack_deep; i++){
-        test_stack.push(temp_stack.pop());
+        test_stack.push(temp_search_stack.pop());
     }
     if(!found){
         cout<<"Stack searching error"<<endl;
@@ -286,27 +290,28 @@ void stack_operations(int size_of_stack){
     int random_deep = rand() % size_of_stack;
     random_value = rand() % 1000000;
     t_start = high_resolution_clock::now();
-    temp_stack = Stack();
+    Stack temp_put_stack = Stack();
     for(int i = 0; i < random_deep; i++){
-        temp_stack.push(test_stack.pop());
+        int temp = test_stack.pop();
+        temp_put_stack.push(temp);
     }
     test_stack.push(random_value);
     for(int i = 0; i < random_deep; i++){
-        test_stack.push(temp_stack.pop());
+        test_stack.push(temp_put_stack.pop());
     }
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
     this_restult = {"stack","search",to_string(size_of_stack),to_string(time_span.count())};
     results.push_back(this_restult);
 }
+
 void list_operations(int size_of_list){
 
 }
+
 void queue_operations(int size_of_queue){
 
 }
-
-
 
 int main(){
     load_config();
@@ -332,7 +337,7 @@ int main(){
                         cout<<"done"<<endl;
                     }
                 }
-                cout<<"Done"<<endl;
+                cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "list"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
@@ -341,7 +346,7 @@ int main(){
                         cout<<"done"<<endl;
                     }
                 }
-                cout<<"Done"<<endl;
+                cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "stack"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
@@ -350,7 +355,7 @@ int main(){
                         cout<<"done"<<endl;
                     }
                 }
-                cout<<"Done"<<endl;
+                cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "queue"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
