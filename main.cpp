@@ -250,8 +250,8 @@ void stack_operations(int size_of_stack){
     t_start = high_resolution_clock::now();
     int temp_stack_deep = 0;
     Stack temp_search_stack = Stack();
-    for(int i = 0; i < size_of_stack; i++){
-        if(test_stack.peek() == data_vector[i]){
+    for(int i = (size_of_stack-1); i >= 0; i--){
+        if(test_stack.peek() == searched_value){
             t_end = high_resolution_clock::now();
             found = true;
             break;
@@ -301,7 +301,7 @@ void stack_operations(int size_of_stack){
     }
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"stack","search",to_string(size_of_stack),to_string(time_span.count())};
+    this_restult = {"stack","put",to_string(size_of_stack),to_string(time_span.count())};
     results.push_back(this_restult);
 }
 
