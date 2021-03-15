@@ -18,6 +18,50 @@ string data_file_name = "";
 int data_amount = 0;
 string results_file_name = "";
 
+class Stack
+{
+    private:
+        int *num = new int[10000000];
+        int top;
+    public:
+        Stack(){
+            top=-1;
+        }
+        int push(int n){
+            if(isFull()){
+                return 0;
+            }
+            ++top;
+            num[top]=n;
+            return n;
+        }
+        int pop(){
+            int temp;
+            if(isEmpty())
+                return 0;
+            temp=num[top];
+            --top;
+            return temp;
+        }
+        int isEmpty(){
+            if(top==-1)
+                return 1;
+            else
+                return 0; 
+        }
+        int isFull(){
+            if(top==(9999999))
+                return 1;
+            else
+                return 0;
+        }
+        int peek(){
+            if(isEmpty())
+                return 0;
+            return num[top];
+        }
+};
+
 void generate_data(string file_name,int amount){
     cout<<"Generating "<<amount<<" numbers to data file "<<file_name<<endl;
     fstream fout;
@@ -96,6 +140,17 @@ void print_config(){
     }
 }
 
+void save_results(string results_file_name){
+    cout<<"Saving results"<<endl;
+    fstream fout;
+    fout.open(results_file_name,ios::out);
+    fout<<"data_structure,operation,size_of_structure,time_of_operation_s"<<endl;
+    for(int i = 0; i < results.size(); i++){
+        fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
+    }
+    cout<<"Correctly saved "<<results.size()<<" results"<<endl;
+}
+
 void array_operations(int size_of_array){
     using namespace std::chrono;
     //CREATE OPERATION
@@ -106,7 +161,6 @@ void array_operations(int size_of_array){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    //Time in miliseconds
     vector<string> this_restult = {"array","create",to_string(size_of_array),to_string(time_span.count())};
     results.push_back(this_restult);
     //SEARCH OPERATION
@@ -173,7 +227,77 @@ void array_operations(int size_of_array){
 }
 
 void stack_operations(int size_of_stack){
-
+    using namespace std::chrono;
+    //CREATE OPERATION
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    Stack test_stack = Stack();
+    for(int i = 0; i < size_of_stack; i++){
+        test_stack.push(data_vector[i]);
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    vector<string> this_restult = {"stack","create",to_string(size_of_stack),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //SEARCH OPERATION
+    srand(time(NULL));
+    int random_index = rand() % size_of_stack;
+    int searched_value = data_vector[random_index];
+    bool found = false;
+    t_start = high_resolution_clock::now();
+    int temp_stack_deep = 0;
+    Stack temp_stack = Stack();
+    for(int i = 0; i < size_of_stack; i++){
+        if(test_stack.peek() == data_vector[i]){
+            t_end = high_resolution_clock::now();
+            found = true;
+            break;
+        }else{
+            temp_stack.push(test_stack.pop());
+            temp_stack_deep++;
+        }
+    }
+    for(int i = 0; i < temp_stack_deep; i++){
+        test_stack.push(temp_stack.pop());
+    }
+    if(!found){
+        cout<<"Stack searching error"<<endl;
+        t_end = high_resolution_clock::now();
+    }
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"stack","search",to_string(size_of_stack),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //PUSH OPERATION
+    int random_value = rand() % 1000000;
+    t_start = high_resolution_clock::now();
+    test_stack.push(random_value);
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"stack","push",to_string(size_of_stack),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //POP OPERATION
+    t_start = high_resolution_clock::now();
+    test_stack.pop();
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"stack","pop",to_string(size_of_stack),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //PUT OPERATION
+    srand(time(NULL));
+    int random_deep = rand() % size_of_stack;
+    random_value = rand() % 1000000;
+    t_start = high_resolution_clock::now();
+    temp_stack = Stack();
+    for(int i = 0; i < random_deep; i++){
+        temp_stack.push(test_stack.pop());
+    }
+    test_stack.push(random_value);
+    for(int i = 0; i < random_deep; i++){
+        test_stack.push(temp_stack.pop());
+    }
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"stack","search",to_string(size_of_stack),to_string(time_span.count())};
+    results.push_back(this_restult);
 }
 void list_operations(int size_of_list){
 
@@ -182,17 +306,7 @@ void queue_operations(int size_of_queue){
 
 }
 
-void save_results(string results_file_name){
-    cout<<"Saving results"<<endl;
-    fstream fout;
-    fout.open(results_file_name,ios::out);
-    fout<<"data_strucutre,operation,size_of_structure,time_of_operation_ns"<<endl;
-    for(int i = 0; i < results.size(); i++){
-        fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
-    }
-    cout<<"Correctly saved "<<results.size()<<" results"<<endl;
 
-}
 
 int main(){
     load_config();
@@ -213,31 +327,39 @@ int main(){
             if(tasks[i][0] == "array"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
+                        cout<<"Array operations with "<<j<<" elements ";
                         array_operations(j);
+                        cout<<"done"<<endl;
                     }
                 }
                 cout<<"Done"<<endl;
             }else if(tasks[i][0] == "list"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
+                        cout<<"List operations with "<<j<<" elements ";
                         list_operations(j);
+                        cout<<"done"<<endl;
                     }
                 }
                 cout<<"Done"<<endl;
             }else if(tasks[i][0] == "stack"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
+                        cout<<"Stack operations with "<<j<<" elements ";
                         stack_operations(j);
+                        cout<<"done"<<endl;
                     }
                 }
                 cout<<"Done"<<endl;
             }else if(tasks[i][0] == "queue"){
                 for(int j = start_range; j <= end_range; j += step){
                     for(int k = 0; k < time_repeat; k++){
+                        cout<<"Queue operations with "<<j<<" elements ";
                         queue_operations(j);
+                        cout<<"done"<<endl;
                     }
                 }
-                cout<<"Done"<<endl;
+                cout<<"Task done"<<endl;
             }else{
                 cout<<"Cannot recognize "<<tasks[i][0]<<" structure";
             }
