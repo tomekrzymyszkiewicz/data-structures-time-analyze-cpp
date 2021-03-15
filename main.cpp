@@ -3,11 +3,13 @@
 #include<fstream>
 #include<sstream>
 #include<string>
-#include <random>
-#include <vector>
-#include <filesystem>
-#include <windows.h>
-#include <ctime>
+#include<random>
+#include<vector>
+#include<filesystem>
+#include<windows.h>
+#include<ctime>
+#include <ratio>
+#include<chrono>
 using namespace std;
 vector<int> data_vector;
 vector<vector<string>> tasks;
@@ -17,6 +19,7 @@ int data_amount = 0;
 string results_file_name = "";
 
 void generate_data(string file_name,int amount){
+    cout<<"Generating "<<amount<<" numbers to data file "<<file_name<<endl;
     fstream fout;
     fout.open("data.csv",ios::out);
     random_device rd;
@@ -25,13 +28,15 @@ void generate_data(string file_name,int amount){
     for(int i = 0; i < amount; i++){
         fout<<dis(gen)<<"\n";
     }
+    cout<<"Data generated correctly"<<endl;
 }
 
 bool load_data(string file_name, int amount){
+    cout<<"Loading data from "<<file_name<<" file"<<endl;
     ifstream fin;
     fin.open(file_name,ios::in);
     if(fin.fail()){
-        cout<<"file not exist"<<endl;
+        cout<<"Data file "<<file_name<<" not exist"<<endl;
         return false;
     }
     string line;
@@ -41,20 +46,21 @@ bool load_data(string file_name, int amount){
         if(!fin.eof()){
             data_vector.push_back(stoi(line));
         }else{
-            cout<<"not enought elements"<<endl;
+            cout<<"Not enough elements in data file "<<file_name<<endl;
             return false;
         } 
         data_loaded++;
     }
-    cout<<"data laoded"<<data_loaded<<endl;
+    cout<<"Loaded correctly "<<data_loaded<<" numbers"<<endl;
     return true;
 }
 
 bool load_config(){
+    cout<<"Loading config.ini"<<endl;
     ifstream fin;
     fin.open("config.ini",ios::in);
     if(fin.fail()){
-        cout<<"config not exist"<<endl;
+        cout<<"Config.ini not found"<<endl;
         return false;
     }
     vector<string> row;
@@ -75,7 +81,7 @@ bool load_config(){
         task.push_back(time);
         tasks.push_back(task);
     }
-
+    cout<<"Config loaded correctly"<<endl;
     return true;
 }
 
@@ -91,53 +97,51 @@ void print_config(){
 }
 
 void array_operations(int size_of_array){
+    using namespace std::chrono;
     //CREATE OPERATION
-    clock_t t_start = clock();
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
     int *test_array = new int[size_of_array];
     for(int i = 0; i < size_of_array; i++){
         test_array[i] = data_vector[i];
     }
-    clock_t t_end = clock();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
     //Time in miliseconds
-    double t_create = 1000*(t_end - t_start)/CLOCKS_PER_SEC;
-    cout<<t_start<<endl;
-    cout<<t_end<<endl;
-    cout<<t_create<<endl;
-    vector<string> this_restult = {"array","create",to_string(size_of_array),to_string(t_create)};
+    vector<string> this_restult = {"array","create",to_string(size_of_array),to_string(time_span.count())};
     results.push_back(this_restult);
     //SEARCH OPERATION
     srand(time(NULL));
     int random_index = rand() % size_of_array;
     int searched_value = data_vector[random_index];
     bool found = false;
-    t_start = clock();
+    t_start = high_resolution_clock::now();
     for(int i = 0; i < size_of_array; i++){
         if(test_array[i] == data_vector[i]){
-            t_end = clock();
+            t_end = high_resolution_clock::now();
             found = true;
             break;
         }
     }
     if(!found){
         cout<<"Array searching error"<<endl;
-        t_end = clock();
+        t_end = high_resolution_clock::now();
     }
-    double t_search = 1000*(t_end - t_start)/CLOCKS_PER_SEC;
-    this_restult = {"array","search",to_string(size_of_array),to_string(t_search)};
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"array","search",to_string(size_of_array),to_string(time_span.count())};
     results.push_back(this_restult);
     //PUT OPERATION
     random_index = rand() % size_of_array;
-    t_start = clock();
+    t_start = high_resolution_clock::now();
     test_array[random_index] = 0;
-    t_end = clock();
+    t_end = high_resolution_clock::now();
     test_array[random_index] = data_vector[random_index];
-    double t_put = 1000*(t_end - t_start)/CLOCKS_PER_SEC;
-    this_restult = {"array","put",to_string(size_of_array),to_string(t_put)};
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"array","put",to_string(size_of_array),to_string(time_span.count())};
     results.push_back(this_restult);
     //ADD OPERATION
     int *temp_test_array = test_array;
     int random_value = rand() % 1000000;
-    t_start = clock();
+    t_start = high_resolution_clock::now();
     int *temp_array = new int[(size_of_array+1)];
     for(int i = 0;i < size_of_array; i++){
         temp_array[i] = test_array[i];
@@ -145,15 +149,15 @@ void array_operations(int size_of_array){
     temp_array[size_of_array] = random_value;
     test_array = temp_array;
     delete temp_array;
-    t_end = clock();
-    double t_add = 1000*(t_end - t_start)/CLOCKS_PER_SEC;
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
     test_array = temp_test_array;
-    this_restult = {"array","add",to_string(size_of_array),to_string(t_add)};
+    this_restult = {"array","add",to_string(size_of_array),to_string(time_span.count())};
     results.push_back(this_restult);
     //DELETE OPERATION
     random_index = rand() % size_of_array;
     random_index = 1;
-    t_start = clock();
+    t_start = high_resolution_clock::now();
     temp_array = new int[(size_of_array-1)];
     for(int i = 0;i < random_index; i++){
         temp_array[i] = test_array[i];
@@ -162,20 +166,32 @@ void array_operations(int size_of_array){
         temp_array[(i-1)] = test_array[i];
     }
     test_array = temp_array;
-    t_end = clock();
-    double t_delete = 1000*(t_end - t_start)/CLOCKS_PER_SEC;
-    this_restult = {"array","delete",to_string(size_of_array),to_string(t_delete)};
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"array","delete",to_string(size_of_array),to_string(time_span.count())};
     results.push_back(this_restult);
 }
 
+void stack_operations(int size_of_stack){
+
+}
+void list_operations(int size_of_list){
+
+}
+void queue_operations(int size_of_queue){
+
+}
+
 void save_results(string results_file_name){
+    cout<<"Saving results"<<endl;
     fstream fout;
     fout.open(results_file_name,ios::out);
     fout<<"data_strucutre,operation,size_of_structure,time_of_operation_ns"<<endl;
-    cout<<"results size: "<<results.size()<<endl;
     for(int i = 0; i < results.size(); i++){
         fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
     }
+    cout<<"Correctly saved "<<results.size()<<" results"<<endl;
+
 }
 
 int main(){
@@ -184,12 +200,49 @@ int main(){
         generate_data(data_file_name,data_amount);
         load_data(data_file_name,data_amount);
     }
-    // for(int i = 0; i <data_vector.size();i++){
-    //     cout<<data_vector[i]<<endl;
-    // }
-    //print_config();
-    array_operations(999999);
+    for(int i = 0;i < tasks.size(); i++){
+        int start_range = stoi(tasks[i][1]);
+        int end_range = stoi(tasks[i][2]);
+        int step = stoi(tasks[i][3]);
+        int time_repeat = stoi(tasks[i][4]);
+        cout<<"Task on "<<tasks[i][0]<<" in range from "<<start_range<<" to "<<end_range<<" with step "<<step<<" made "<<time_repeat<<" times"<<endl;
+        if(start_range<1||end_range>data_vector.size()||time_repeat < 1){
+            cout<<"Cannot execute task in this range"<<endl;
+        }
+        else{
+            if(tasks[i][0] == "array"){
+                for(int j = start_range; j <= end_range; j += step){
+                    for(int k = 0; k < time_repeat; k++){
+                        array_operations(j);
+                    }
+                }
+                cout<<"Done"<<endl;
+            }else if(tasks[i][0] == "list"){
+                for(int j = start_range; j <= end_range; j += step){
+                    for(int k = 0; k < time_repeat; k++){
+                        list_operations(j);
+                    }
+                }
+                cout<<"Done"<<endl;
+            }else if(tasks[i][0] == "stack"){
+                for(int j = start_range; j <= end_range; j += step){
+                    for(int k = 0; k < time_repeat; k++){
+                        stack_operations(j);
+                    }
+                }
+                cout<<"Done"<<endl;
+            }else if(tasks[i][0] == "queue"){
+                for(int j = start_range; j <= end_range; j += step){
+                    for(int k = 0; k < time_repeat; k++){
+                        queue_operations(j);
+                    }
+                }
+                cout<<"Done"<<endl;
+            }else{
+                cout<<"Cannot recognize "<<tasks[i][0]<<" structure";
+            }
+        }
+    }
     save_results(results_file_name);
     return 0;
-
 }
