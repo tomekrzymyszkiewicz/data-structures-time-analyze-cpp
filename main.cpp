@@ -8,8 +8,10 @@
 #include<filesystem>
 #include<windows.h>
 #include<ctime>
-#include <ratio>
+#include<ratio>
+#include<conio.h>
 #include<chrono>
+#include<cstring>
 using namespace std;
 vector<int> data_vector;
 vector<vector<string>> tasks;
@@ -17,6 +19,125 @@ vector<vector<string>> results;
 string data_file_name = "";
 int data_amount = 0;
 string results_file_name = "";
+
+struct Node {
+    int number;
+    Node *next;
+    Node(){
+        next = 0;
+    }
+    int get_data(){
+        return number;
+    }
+};
+
+class List
+{
+private: 
+	typedef struct Node
+	{
+		int data;
+		Node *nextNode;
+	} * node_ptr;
+
+	node_ptr head;
+
+	size_t sz;
+
+	void incrementSize(){
+        this->sz++;
+    }
+	void decrementSize(){
+        this->sz--;
+    }
+
+public:
+	List(){
+        this->head = nullptr;
+	    this->sz = 0;
+    }
+    bool find(int data){
+        node_ptr currentNodePtr = this->head;
+	    while (currentNodePtr != nullptr)
+	    {
+            if((currentNodePtr->data) == data){
+                return true;
+            }
+		    currentNodePtr = currentNodePtr->nextNode;
+	    }
+        return false;
+    }
+
+	void add(int data){
+        node_ptr newNodePtr = new Node;
+	    newNodePtr->data = data; 
+	    newNodePtr->nextNode = nullptr;			
+    	if (isEmpty())
+	    {
+		    this->head = newNodePtr;
+	    } 
+    	else 
+	    {	
+		    node_ptr prevHeadPtr = this->head;	
+		    this->head = newNodePtr;			
+		    newNodePtr->nextNode = prevHeadPtr; 
+    	}
+	    incrementSize();
+    
+    }
+	bool remove(int data){
+        node_ptr prevNodePtr = nullptr;
+	    node_ptr currentNodePtr = head;
+
+	    if (isEmpty())
+	    {
+	    	return false;
+	    }
+    	while (currentNodePtr != nullptr)
+    	{
+    		if (data == currentNodePtr->data)
+    		{
+    			node_ptr nodeAfterCurrentPtr = currentNodePtr->nextNode;
+    			if (prevNodePtr == nullptr)
+    			{
+    				this->head = nodeAfterCurrentPtr;
+    			}
+    			else
+    			{
+    				prevNodePtr->nextNode = nodeAfterCurrentPtr;
+    			}
+    			delete currentNodePtr;
+    			decrementSize();
+    			return true;
+    		}
+    		prevNodePtr = currentNodePtr;
+    		currentNodePtr = currentNodePtr->nextNode;
+        }
+        return false;
+    }
+	bool isEmpty(){
+        return this->head == nullptr;
+    }
+
+	void emptyList(){
+        node_ptr currentNodePtr;
+    	while (this->head != nullptr)
+    	{
+    		currentNodePtr = this->head;
+    		this->head = this->head->nextNode;	
+    		delete currentNodePtr;
+    	}
+    	this->sz = 0;
+    }
+
+	size_t size(){
+        return this->sz;
+    }
+
+	~List(){
+        this->emptyList();
+    }
+};
 
 class Stack
 {
@@ -64,6 +185,49 @@ class Stack
                 return 0;
             return num[top];
         }
+};
+
+class Queue
+{
+    Node *front, *rear;
+public:
+    Queue()
+    {
+        front = rear = NULL;
+    }
+    void enqueue(int number)
+    {
+        Node *newnode;
+        newnode = new Node;
+        newnode->number = number;
+        newnode->next = NULL;
+        if(front == NULL)
+            front = rear = newnode;
+        else
+        {
+            rear->next = newnode;
+            rear = newnode;
+        }
+    }
+    int dequeue()
+    {
+        Node *temp;
+        if(front == NULL){
+            cout<<"Queue is Empty";
+            return 0;
+        }
+        else
+        {
+            temp= front;
+            int temp_number = front->number;
+            front = front->next;
+            delete temp;
+            return temp_number;
+        }
+    }
+    int peek(){
+        return front->number;
+    }
 };
 
 void generate_data(string file_name,int amount){
@@ -306,11 +470,101 @@ void stack_operations(int size_of_stack){
 }
 
 void list_operations(int size_of_list){
-
+    using namespace std::chrono;
+    //CREATE OPERATION
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    List test_list;
+    for(int i = 0; i < size_of_list; i++){
+        test_list.add(data_vector[i]);
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    vector<string> this_restult = {"list","create",to_string(size_of_list),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //SEARCH OPERATION
+    int random_index = rand() % size_of_list;
+    int searched_value = data_vector[random_index];
+    t_start = high_resolution_clock::now();
+    if(!test_list.find(searched_value)){
+        cout<<" find error ";
+    }
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"list","search",to_string(size_of_list),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //ADD OPERATION
+    int random_value = rand() % 1000000;
+    t_start = high_resolution_clock::now();
+    test_list.add(random_value);
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"list","add",to_string(size_of_list),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //DELETE OPERATION
+    t_start = high_resolution_clock::now();
+    if(!test_list.remove(random_value)){
+        cout<<" delete error ";
+    }
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"list","delete",to_string(size_of_list),to_string(time_span.count())};
+    results.push_back(this_restult);
 }
 
 void queue_operations(int size_of_queue){
-
+    using namespace std::chrono;
+    //CREATE OPERATION
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    Queue test_queue;
+    for(int i = 0; i < size_of_queue; i++){
+        test_queue.enqueue(data_vector[i]);
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    vector<string> this_restult = {"queue","create",to_string(size_of_queue),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //SEARCH OPERATION
+    int random_index = rand() % size_of_queue;
+    int searched_value = data_vector[random_index];
+    t_start = high_resolution_clock::now();
+    Queue temp_search_queue;
+    int temp_queue_len = 0;
+    bool found = false;
+    for(int i = 0; i < size_of_queue; i++){
+        if(test_queue.peek() == searched_value){
+            found = true;
+            break;
+        }else{
+            temp_search_queue.enqueue(test_queue.dequeue());
+        }
+        temp_queue_len++;
+    }
+    for(int i = 0; i < temp_queue_len; i++){
+        test_queue.enqueue(temp_search_queue.dequeue());
+    }
+    if(!found){
+        cout<<" queue search error "<<endl;
+    }
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"queue","search",to_string(size_of_queue),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //ADD OPERATION
+    int random_value = rand() % 1000000;
+    t_start = high_resolution_clock::now();
+    test_queue.enqueue(random_value);
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"queue","enqueue",to_string(size_of_queue),to_string(time_span.count())};
+    results.push_back(this_restult);
+    //DELETE OPERATION
+    t_start = high_resolution_clock::now();
+    test_queue.dequeue();
+    t_end = high_resolution_clock::now();
+    time_span = duration_cast<duration<double>>(t_end - t_start);
+    this_restult = {"queue","dequeue",to_string(size_of_queue),to_string(time_span.count())};
+    results.push_back(this_restult);
+    
 }
 
 int main(){
@@ -371,5 +625,7 @@ int main(){
         }
     }
     save_results(results_file_name);
+    cout<<"Press any key to continue...";
+    getch();
     return 0;
 }
