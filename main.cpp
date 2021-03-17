@@ -194,52 +194,74 @@ class Stack
         }
 };
 
-class Queue
-{
-	int *queue; 
-	int top;
-	public:
-		int enqueue(int new_item){
-            if(top==999999)
-     	    {
-	            return 0;
-  		    }
-            else{
-  	            top=top+1;
-  	            queue[top]=new_item;
-                return queue[top];
-  	        }
-        }
-		int dequeue(){
-            int temp;
- 	        if(top==-1)
- 	        {
- 		        return 0;
-	        }
-	        else
-	        {
-		        temp=queue[top];
-		        top=top-1;
-	        }
-            return(temp);
-        }
-		int peek(){
-            if(top==-1)
- 	            return 0;
- 	        else
- 	 		    return queue[top];
-        }
-	Queue()
-	{
-        queue = new int[10000000];
-		top=-1;
-	}
-    ~Queue()
-    {
-        delete[] queue;
+class Queue {
+public:
+    int front, rear, size;
+    unsigned capacity;
+    int* array;
+    ~Queue(){
+        delete[] array;
     }
-
 };
+
+Queue* createQueue(unsigned capacity)
+{
+    Queue* queue = new Queue();
+    queue->capacity = capacity;
+    queue->front = queue->size = 0;
+    queue->rear = capacity - 1;
+    queue->array = new int[queue->capacity];
+    return queue;
+}
+
+void deleteQueue(Queue* queue){
+    delete queue;
+}
+ 
+int isFull(Queue* queue)
+{
+    return (queue->size == queue->capacity);
+}
+ 
+int isEmpty(Queue* queue)
+{
+    return (queue->size == 0);
+}
+ 
+void enqueue(Queue* queue, int item)
+{
+    if (isFull(queue))
+        return;
+    queue->rear = (queue->rear + 1)
+                  % queue->capacity;
+    queue->array[queue->rear] = item;
+    queue->size = queue->size + 1;
+}
+ 
+int dequeue(Queue* queue)
+{
+    if (isEmpty(queue))
+        return INT_MIN;
+    int item = queue->array[queue->front];
+    queue->front = (queue->front + 1)
+                   % queue->capacity;
+    queue->size = queue->size - 1;
+    return item;
+}
+ 
+int front(Queue* queue)
+{
+    if (isEmpty(queue))
+        return INT_MIN;
+    return queue->array[queue->front];
+}
+ 
+int rear(Queue* queue)
+{
+    if (isEmpty(queue))
+        return INT_MIN;
+    return queue->array[queue->rear];
+}
 
 void generate_data(string file_name,int amount){
     cout<<"Generating "<<amount<<" numbers to data file "<<file_name<<endl;
@@ -526,9 +548,9 @@ void queue_operations(int size_of_queue){
     using namespace std::chrono;
     //CREATE OPERATION
     high_resolution_clock::time_point t_start = high_resolution_clock::now();
-    Queue test_queue;
+    Queue* test_queue = createQueue(size_of_queue);
     for(int i = 0; i < size_of_queue; i++){
-        test_queue.enqueue(data_vector[i]);
+        enqueue(test_queue,data_vector[i]);
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
@@ -538,20 +560,20 @@ void queue_operations(int size_of_queue){
     int random_index = rand() % size_of_queue;
     int searched_value = data_vector[random_index];
     t_start = high_resolution_clock::now();
-    Queue temp_search_queue;
+    Queue* temp_search_queue = createQueue(size_of_queue);
     int temp_queue_len = 0;
     bool found = false;
     for(int i = 0; i < size_of_queue; i++){
-        if(test_queue.peek() == searched_value){
+        if(front(test_queue) == searched_value){
             found = true;
             break;
         }else{
-            temp_search_queue.enqueue(test_queue.dequeue());
+            enqueue(temp_search_queue,dequeue(test_queue));
         }
         temp_queue_len++;
     }
     for(int i = 0; i < temp_queue_len; i++){
-        test_queue.enqueue(temp_search_queue.dequeue());
+        enqueue(test_queue,dequeue(temp_search_queue));
     }
     if(!found){
         cout<<" queue search error "<<endl;
@@ -560,21 +582,23 @@ void queue_operations(int size_of_queue){
     time_span = duration_cast<duration<double>>(t_end - t_start);
     Result queue_searched_result = Result("queue","search",size_of_queue,time_span.count());
     results.push_back(queue_searched_result.toString());
+    deleteQueue(temp_search_queue);
     //ADD OPERATION
     int random_value = rand() % 1000000;
     t_start = high_resolution_clock::now();
-    test_queue.enqueue(random_value);
+    enqueue(test_queue,random_value);
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
     Result queue_enqueue_result = Result("queue","enqueue",size_of_queue,time_span.count());
     results.push_back(queue_enqueue_result.toString());
     //DELETE OPERATION
     t_start = high_resolution_clock::now();
-    test_queue.dequeue();
+    dequeue(test_queue);
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    Result queue_dequeue_result = Result("list","dequeue",size_of_queue,time_span.count());
+    Result queue_dequeue_result = Result("queue","dequeue",size_of_queue,time_span.count());
     results.push_back(queue_dequeue_result.toString());
+    deleteQueue(test_queue);
     
 }
 
