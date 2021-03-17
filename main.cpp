@@ -38,17 +38,6 @@ struct Result{
 
 };
 
-struct Node {
-    int number;
-    Node *next;
-    Node(){
-        next = 0;
-    }
-    int get_data(){
-        return number;
-    }
-};
-
 class List
 {
 private: 
@@ -207,45 +196,49 @@ class Stack
 
 class Queue
 {
-    Node *front, *rear;
-public:
-    Queue()
-    {
-        front = rear = NULL;
-    }
-    void enqueue(int number)
-    {
-        Node *newnode;
-        newnode = new Node;
-        newnode->number = number;
-        newnode->next = NULL;
-        if(front == NULL)
-            front = rear = newnode;
-        else
-        {
-            rear->next = newnode;
-            rear = newnode;
+	int *queue; 
+	int top;
+	public:
+		int enqueue(int new_item){
+            if(top==999999)
+     	    {
+	            return 0;
+  		    }
+            else{
+  	            top=top+1;
+  	            queue[top]=new_item;
+                return queue[top];
+  	        }
         }
-    }
-    int dequeue()
+		int dequeue(){
+            int temp;
+ 	        if(top==-1)
+ 	        {
+ 		        return 0;
+	        }
+	        else
+	        {
+		        temp=queue[top];
+		        top=top-1;
+	        }
+            return(temp);
+        }
+		int peek(){
+            if(top==-1)
+ 	            return 0;
+ 	        else
+ 	 		    return queue[top];
+        }
+	Queue()
+	{
+        queue = new int[10000000];
+		top=-1;
+	}
+    ~Queue()
     {
-        Node *temp;
-        if(front == NULL){
-            cout<<"Queue is Empty";
-            return 0;
-        }
-        else
-        {
-            temp= front;
-            int temp_number = front->number;
-            front = front->next;
-            delete temp;
-            return temp_number;
-        }
+        delete[] queue;
     }
-    int peek(){
-        return front->number;
-    }
+
 };
 
 void generate_data(string file_name,int amount){
