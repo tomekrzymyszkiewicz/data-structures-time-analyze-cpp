@@ -408,7 +408,11 @@ void array_search_operation(int size_of_array, int number_of_repeats){
     bool found = false;
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
     for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        int random_index = rand() % size_of_array;
+        int searched_value = data_vector[random_index];
+        t_start = high_resolution_clock::now();
         for(int i = 0; i < size_of_array; i++){
             if(test_array[i] == searched_value){
                 t_end = high_resolution_clock::now();
@@ -420,8 +424,8 @@ void array_search_operation(int size_of_array, int number_of_repeats){
             cout<<"Array searching error"<<endl;
             t_end = high_resolution_clock::now();
         }
+        time_span += duration_cast<duration<double>>(t_end - t_start);
     }
-    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
     Result array_search_result = Result("array","search",size_of_array,time_span.count(),number_of_repeats);
     results.push_back(array_search_result.toString());
     delete[] test_array;
@@ -444,7 +448,7 @@ void array_delete_operation(int size_of_array, int number_of_repeats){
         delete[] test_array;
         test_array = temp_delete_array;
         t_end = high_resolution_clock::now();
-        time_span = time_span + duration_cast<duration<double>>(t_end - t_start);
+        time_span += duration_cast<duration<double>>(t_end - t_start);
         delete[] temp_delete_array; 
     }
     Result array_delete_result = Result("array","delete",size_of_array,time_span.count(),number_of_repeats);
@@ -552,6 +556,129 @@ void array_operations(int size_of_array){
     delete[] temp_delete_array;
 }
 
+void stack_create_operation(int size_of_stack, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Stack test_stack = Stack();
+        for(int i = 0; i < size_of_stack; i++){
+            test_stack.push(data_vector[i]);
+        }
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    Result stack_create_result = Result("stack","create",size_of_stack,time_span.count(),number_of_repeats);
+    results.push_back(stack_create_result.toString());
+}
+
+void stack_search_operation(int size_of_stack, int number_of_repeats){
+    using namespace std::chrono;
+    Stack test_stack = Stack();
+    for(int i = 0; i < size_of_stack; i++){
+        test_stack.push(data_vector[i]);
+    }
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    srand(time(NULL));
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        int random_index = rand() % size_of_stack;
+        int searched_value = data_vector[random_index];
+        bool found = false;
+        t_start = high_resolution_clock::now();
+        int temp_stack_deep = 0;
+        Stack temp_search_stack = Stack();
+        for(int i = (size_of_stack-1); i >= 0; i--){
+            if(test_stack.peek() == searched_value){
+                t_end = high_resolution_clock::now();
+                found = true;
+                break;
+            }else{
+                temp_search_stack.push(test_stack.pop());
+                temp_stack_deep++;
+            }
+        }
+        for(int i = 0; i < temp_stack_deep; i++){
+            test_stack.push(temp_search_stack.pop());
+        }
+        if(!found){
+            cout<<"Stack searching error"<<endl;
+            t_end = high_resolution_clock::now();
+        }
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result stack_search_result = Result("stack","search",size_of_stack,time_span.count(),number_of_repeats);
+    results.push_back(stack_search_result.toString());
+}
+
+void stack_push_operation(int size_of_stack, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Stack test_stack = Stack();
+        for(int i = 0; i < size_of_stack; i++){
+            test_stack.push(data_vector[i]);
+        }
+        int random_value = rand() % 1000000;   
+        t_start = high_resolution_clock::now();
+        test_stack.push(random_value);
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result stack_push_result = Result("stack","push",size_of_stack,time_span.count(),number_of_repeats);
+    results.push_back(stack_push_result.toString());
+}
+
+void stack_pop_operation(int size_of_stack, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Stack test_stack = Stack();
+        for(int i = 0; i < size_of_stack; i++){
+            test_stack.push(data_vector[i]);
+        }
+        t_start = high_resolution_clock::now();
+        test_stack.pop();
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result stack_pop_result = Result("stack","pop",size_of_stack,time_span.count(),number_of_repeats);
+    results.push_back(stack_pop_result.toString());
+}
+
+void stack_put_operation(int size_of_stack, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Stack test_stack = Stack();
+        for(int i = 0; i < size_of_stack; i++){
+            test_stack.push(data_vector[i]);
+        }
+        int random_deep = rand() % size_of_stack;
+        int random_value = rand() % 1000000;
+        t_start = high_resolution_clock::now();
+        Stack temp_put_stack = Stack();
+        for(int i = 0; i < random_deep; i++){
+            int temp = test_stack.pop();
+            temp_put_stack.push(temp);
+        }
+        test_stack.push(random_value);
+        for(int i = 0; i < random_deep; i++){
+            test_stack.push(temp_put_stack.pop());
+        }
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result stack_pop_result = Result("stack","put",size_of_stack,time_span.count(),number_of_repeats);
+    results.push_back(stack_pop_result.toString());
+}
+
 void stack_operations(int size_of_stack){
     using namespace std::chrono;
     //CREATE OPERATION
@@ -627,6 +754,90 @@ void stack_operations(int size_of_stack){
     results.push_back(stack_put_result.toString());
 }
 
+void list_create_operation(int size_of_list, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        List test_list;
+        for(int i = 0; i < size_of_list; i++){
+            test_list.add(data_vector[i]);
+        }
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    Result list_create_result = Result("list","create",size_of_list,time_span.count(),number_of_repeats);
+    results.push_back(list_create_result.toString());
+}
+
+void list_search_operation(int size_of_list, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    srand(time(NULL));
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        List test_list;
+        for(int i = 0; i < size_of_list; i++){
+            test_list.add(data_vector[i]);
+        }
+        int random_index = rand() % size_of_list;
+        int searched_value = data_vector[random_index];
+        t_start = high_resolution_clock::now();
+        if(!test_list.find(searched_value)){
+            cout<<" find error ";
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+        }
+    }
+    Result list_search_result = Result("list","search",size_of_list,time_span.count(),number_of_repeats);
+    results.push_back(list_search_result.toString());
+}
+
+void list_add_operation(int size_of_list, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    srand(time(NULL));
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        List test_list;
+        for(int i = 0; i < size_of_list; i++){
+            test_list.add(data_vector[i]);
+        }
+        int random_value = rand() % 1000000;
+        t_start = high_resolution_clock::now();
+        test_list.add(random_value);
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result list_add_result = Result("list","add",size_of_list,time_span.count(),number_of_repeats);
+    results.push_back(list_add_result.toString());
+}
+
+void list_delete_operation(int size_of_list, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    srand(time(NULL));
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        List test_list;
+        for(int i = 0; i < size_of_list; i++){
+            test_list.add(data_vector[i]);
+        }
+        int random_index = rand() % size_of_list;
+        int random_value = data_vector[random_index];
+        t_start = high_resolution_clock::now();
+        if(!test_list.remove(random_value)){
+            cout<<" delete error ";
+        }
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result list_delete_result = Result("list","delete",size_of_list,time_span.count(),number_of_repeats);
+    results.push_back(list_delete_result.toString());
+}
+
 void list_operations(int size_of_list){
     using namespace std::chrono;
     //CREATE OPERATION
@@ -666,6 +877,100 @@ void list_operations(int size_of_list){
     time_span = duration_cast<duration<double>>(t_end - t_start);
     Result list_delete_result = Result("list","delete",size_of_list,time_span.count());
     results.push_back(list_delete_result.toString());
+}
+
+void queue_create_operation(int size_of_queue, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Queue* test_queue = createQueue(size_of_queue);
+        for(int i = 0; i < size_of_queue; i++){
+            enqueue(test_queue,data_vector[i]);
+        }
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    Result queue_create_result = Result("queue","create",size_of_queue,time_span.count(),number_of_repeats);
+    results.push_back(queue_create_result.toString());
+}
+
+void queue_search_operation(int size_of_queue, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    srand(time(NULL));
+    duration<double> time_span = duration<double>(0);
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Queue* test_queue = createQueue(size_of_queue);
+        for(int i = 0; i < size_of_queue; i++){
+            enqueue(test_queue,data_vector[i]);
+        }
+        int random_index = rand() % size_of_queue;
+        int searched_value = data_vector[random_index];
+        t_start = high_resolution_clock::now();
+        Queue* temp_search_queue = createQueue(size_of_queue);
+        int temp_queue_len = 0;
+        bool found = false;
+        for(int i = 0; i < size_of_queue; i++){
+            if(front(test_queue) == searched_value){
+                found = true;
+                break;
+            }else{
+                enqueue(temp_search_queue,dequeue(test_queue));
+            }
+            temp_queue_len++;
+        }
+        for(int i = 0; i < temp_queue_len; i++){
+            enqueue(test_queue,dequeue(temp_search_queue));
+        }
+        if(!found){
+            cout<<" queue search error "<<endl;
+        }
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result queue_search_result = Result("queue","search",size_of_queue,time_span.count(),number_of_repeats);
+    results.push_back(queue_search_result.toString());
+}
+
+void queue_enqueue_operation(int size_of_queue, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    srand(time(NULL));
+    duration<double> time_span = duration<double>(0);
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Queue* test_queue = createQueue(size_of_queue);
+        for(int i = 0; i < size_of_queue; i++){
+            enqueue(test_queue,data_vector[i]);
+        }
+        int random_value = rand() % 1000000;
+        t_start = high_resolution_clock::now();
+        enqueue(test_queue,random_value);
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result queue_enqueue_result = Result("queue","enqueue",size_of_queue,time_span.count(),number_of_repeats);
+    results.push_back(queue_enqueue_result.toString());
+}
+
+void queue_dequeue_operation(int size_of_queue, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration<double>(0);
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        Queue* test_queue = createQueue(size_of_queue);
+        for(int i = 0; i < size_of_queue; i++){
+            enqueue(test_queue,data_vector[i]);
+        }
+        t_start = high_resolution_clock::now();
+        dequeue(test_queue);
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+    }
+    Result queue_dequeue_result = Result("queue","dequeue",size_of_queue,time_span.count(),number_of_repeats);
+    results.push_back(queue_dequeue_result.toString());
 }
 
 void queue_operations(int size_of_queue){
@@ -751,39 +1056,58 @@ int main(){
                     //     cout<<"done"<<endl;
                     // }
                     cout<<"Array operations with "<<j<<" elements ";
-                    //array_create_operation(j,time_repeat);
-                    //array_search_operation(j,time_repeat);
+                    array_create_operation(j,time_repeat);
+                    array_search_operation(j,time_repeat);
                     array_put_operation(j,time_repeat);
-                    //array_delete_operation(j,time_repeat);
-                    //array_add_operation(j,time_repeat);
+                    array_delete_operation(j,time_repeat);
+                    array_add_operation(j,time_repeat);
                     cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "list"){
                 for(int j = start_range; j <= end_range; j += step){
-                    for(int k = 0; k < time_repeat; k++){
-                        cout<<"List operations with "<<j<<" elements ";
-                        list_operations(j);
-                        cout<<"done"<<endl;
-                    }
+                    // for(int k = 0; k < time_repeat; k++){
+                    //     cout<<"List operations with "<<j<<" elements ";
+                    //     list_operations(j);
+                    //     cout<<"done"<<endl;
+                    // }
+                    cout<<"List operations with "<<j<<" elements ";
+                    list_create_operation(j,time_repeat);
+                    list_search_operation(j,time_repeat);
+                    list_delete_operation(j,time_repeat);
+                    list_add_operation(j,time_repeat);
+                    cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "stack"){
                 for(int j = start_range; j <= end_range; j += step){
-                    for(int k = 0; k < time_repeat; k++){
-                        cout<<"Stack operations with "<<j<<" elements ";
-                        stack_operations(j);
-                        cout<<"done"<<endl;
-                    }
+                    // for(int k = 0; k < time_repeat; k++){
+                    //     cout<<"Stack operations with "<<j<<" elements ";
+                    //     stack_operations(j);
+                    //     cout<<"done"<<endl;
+                    // }
+                    cout<<"Stack operations with "<<j<<" elements ";
+                    stack_create_operation(j,time_repeat);
+                    stack_search_operation(j,time_repeat);
+                    stack_put_operation(j,time_repeat);
+                    stack_pop_operation(j,time_repeat);
+                    stack_push_operation(j,time_repeat);
+                    cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "queue"){
                 for(int j = start_range; j <= end_range; j += step){
-                    for(int k = 0; k < time_repeat; k++){
-                        cout<<"Queue operations with "<<j<<" elements ";
-                        queue_operations(j);
-                        cout<<"done"<<endl;
-                    }
+                    // for(int k = 0; k < time_repeat; k++){
+                    //     cout<<"Queue operations with "<<j<<" elements ";
+                    //     queue_operations(j);
+                    //     cout<<"done"<<endl;
+                    // }
+                    cout<<"Queue operations with "<<j<<" elements ";
+                    queue_create_operation(j,time_repeat);
+                    queue_search_operation(j,time_repeat);
+                    queue_enqueue_operation(j,time_repeat);
+                    queue_dequeue_operation(j,time_repeat);
+                    cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else{
