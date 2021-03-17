@@ -12,13 +12,31 @@
 #include<conio.h>
 #include<chrono>
 #include<cstring>
+#include<algorithm>
 using namespace std;
 vector<int> data_vector;
 vector<vector<string>> tasks;
-vector<vector<string>> results;
+vector<string> results;
 string data_file_name = "";
 int data_amount = 0;
 string results_file_name = "";
+
+struct Result{
+    string data_structure;
+    string operation;
+    int size_of_strucutre;
+    double time_span;
+    Result(string data_structure, string operation, int size_of_strucutre, double time_span){
+        this->data_structure = data_structure;
+        this->operation = operation;
+        this->size_of_strucutre = size_of_strucutre;
+        this->time_span = time_span;
+    }
+    string toString(){
+        return(data_structure+","+operation+","+to_string(size_of_strucutre)+","+to_string(time_span));
+    }
+
+};
 
 struct Node {
     int number;
@@ -314,7 +332,8 @@ void save_results(string results_file_name){
     fout.open(results_file_name,ios::out);
     fout<<"data_structure,operation,size_of_structure,time_of_operation_s"<<endl;
     for(int i = 0; i < results.size(); i++){
-        fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
+        fout<<results[i]<<endl;
+        //fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
     }
     cout<<"Correctly saved "<<results.size()<<" results"<<endl;
 }
@@ -329,8 +348,8 @@ void array_operations(int size_of_array){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    vector<string> this_restult = {"array","create",to_string(size_of_array),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result array_create_result = Result("array","create",size_of_array,time_span.count());
+    results.push_back(array_create_result.toString());
     //SEARCH OPERATION
     srand(time(NULL));
     int random_index = rand() % size_of_array;
@@ -338,7 +357,7 @@ void array_operations(int size_of_array){
     bool found = false;
     t_start = high_resolution_clock::now();
     for(int i = 0; i < size_of_array; i++){
-        if(test_array[i] == data_vector[i]){
+        if(test_array[i] == searched_value){
             t_end = high_resolution_clock::now();
             found = true;
             break;
@@ -349,8 +368,8 @@ void array_operations(int size_of_array){
         t_end = high_resolution_clock::now();
     }
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"array","search",to_string(size_of_array),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result array_search_result = Result("array","search",size_of_array,time_span.count());
+    results.push_back(array_search_result.toString());
     //PUT OPERATION
     random_index = rand() % size_of_array;
     t_start = high_resolution_clock::now();
@@ -358,40 +377,40 @@ void array_operations(int size_of_array){
     t_end = high_resolution_clock::now();
     test_array[random_index] = data_vector[random_index];
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"array","put",to_string(size_of_array),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result array_put_result = Result("array","put",size_of_array,time_span.count());
+    results.push_back(array_put_result.toString());
     //ADD OPERATION
     int *temp_test_array = test_array;
     int random_value = rand() % 1000000;
     t_start = high_resolution_clock::now();
-    int *temp_array = new int[(size_of_array+1)];
-    for(int i = 0;i < size_of_array; i++){
-        temp_array[i] = test_array[i];
-    }
-    temp_array[size_of_array] = random_value;
-    test_array = temp_array;
-    delete temp_array;
+    size_t temp_add_array_size = size_of_array+1;
+    int *temp_add_array = new int[temp_add_array_size];
+    memcpy(temp_add_array, test_array, size_of_array * sizeof(int));
+    temp_add_array[size_of_array] = random_value;
+    delete[] test_array;
+    test_array = temp_add_array;
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
     test_array = temp_test_array;
-    this_restult = {"array","add",to_string(size_of_array),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result array_add_result = Result("array","add",size_of_array,time_span.count());
+    results.push_back(array_add_result.toString());
+    delete[] temp_add_array;
     //DELETE OPERATION
-    random_index = rand() % size_of_array;
-    random_index = 1;
+    int *test_delete_array = new int[size_of_array];
+    for(int i = 0; i < size_of_array; i++){
+        test_delete_array[i] = data_vector[i];
+    }
     t_start = high_resolution_clock::now();
-    temp_array = new int[(size_of_array-1)];
-    for(int i = 0;i < random_index; i++){
-        temp_array[i] = test_array[i];
-    }
-    for(int i = random_index+1; i<size_of_array;i++){
-        temp_array[(i-1)] = test_array[i];
-    }
-    test_array = temp_array;
+    size_t temp_delete_array_size = size_of_array-1;
+    int *temp_delete_array = new int[temp_delete_array_size];
+    memcpy(temp_delete_array, test_delete_array, temp_delete_array_size * sizeof(int));
+    delete[] test_delete_array;
+    test_delete_array = temp_delete_array;
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"array","delete",to_string(size_of_array),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result array_delete_result = Result("array","delete",size_of_array,time_span.count());
+    results.push_back(array_delete_result.toString());
+    delete[] temp_delete_array;
 }
 
 void stack_operations(int size_of_stack){
@@ -404,8 +423,8 @@ void stack_operations(int size_of_stack){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    vector<string> this_restult = {"stack","create",to_string(size_of_stack),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result stack_create_result = Result("stack","create",size_of_stack,time_span.count());
+    results.push_back(stack_create_result.toString());
     //SEARCH OPERATION
     srand(time(NULL));
     int random_index = rand() % size_of_stack;
@@ -432,23 +451,23 @@ void stack_operations(int size_of_stack){
         t_end = high_resolution_clock::now();
     }
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"stack","search",to_string(size_of_stack),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result stack_search_result = Result("stack","search",size_of_stack,time_span.count());
+    results.push_back(stack_search_result.toString());
     //PUSH OPERATION
     int random_value = rand() % 1000000;
     t_start = high_resolution_clock::now();
     test_stack.push(random_value);
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"stack","push",to_string(size_of_stack),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result stack_push_result = Result("stack","push",size_of_stack,time_span.count());
+    results.push_back(stack_push_result.toString());
     //POP OPERATION
     t_start = high_resolution_clock::now();
     test_stack.pop();
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"stack","pop",to_string(size_of_stack),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result stack_pop_result = Result("stack","pop",size_of_stack,time_span.count());
+    results.push_back(stack_pop_result.toString());
     //PUT OPERATION
     srand(time(NULL));
     int random_deep = rand() % size_of_stack;
@@ -465,8 +484,8 @@ void stack_operations(int size_of_stack){
     }
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"stack","put",to_string(size_of_stack),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result stack_put_result = Result("stack","put",size_of_stack,time_span.count());
+    results.push_back(stack_put_result.toString());
 }
 
 void list_operations(int size_of_list){
@@ -479,8 +498,8 @@ void list_operations(int size_of_list){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    vector<string> this_restult = {"list","create",to_string(size_of_list),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result list_create_result = Result("list","create",size_of_list,time_span.count());
+    results.push_back(list_create_result.toString());
     //SEARCH OPERATION
     int random_index = rand() % size_of_list;
     int searched_value = data_vector[random_index];
@@ -489,17 +508,16 @@ void list_operations(int size_of_list){
         cout<<" find error ";
     }
     t_end = high_resolution_clock::now();
-    time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"list","search",to_string(size_of_list),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result list_search_result = Result("list","search",size_of_list,time_span.count());
+    results.push_back(list_search_result.toString());
     //ADD OPERATION
     int random_value = rand() % 1000000;
     t_start = high_resolution_clock::now();
     test_list.add(random_value);
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"list","add",to_string(size_of_list),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result list_add_result = Result("list","add",size_of_list,time_span.count());
+    results.push_back(list_add_result.toString());
     //DELETE OPERATION
     t_start = high_resolution_clock::now();
     if(!test_list.remove(random_value)){
@@ -507,8 +525,8 @@ void list_operations(int size_of_list){
     }
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"list","delete",to_string(size_of_list),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result list_delete_result = Result("list","delete",size_of_list,time_span.count());
+    results.push_back(list_delete_result.toString());
 }
 
 void queue_operations(int size_of_queue){
@@ -521,8 +539,8 @@ void queue_operations(int size_of_queue){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    vector<string> this_restult = {"queue","create",to_string(size_of_queue),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result queue_create_result = Result("queue","create",size_of_queue,time_span.count());
+    results.push_back(queue_create_result.toString());
     //SEARCH OPERATION
     int random_index = rand() % size_of_queue;
     int searched_value = data_vector[random_index];
@@ -547,23 +565,23 @@ void queue_operations(int size_of_queue){
     }
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"queue","search",to_string(size_of_queue),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result queue_searched_result = Result("queue","search",size_of_queue,time_span.count());
+    results.push_back(queue_searched_result.toString());
     //ADD OPERATION
     int random_value = rand() % 1000000;
     t_start = high_resolution_clock::now();
     test_queue.enqueue(random_value);
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"queue","enqueue",to_string(size_of_queue),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result queue_enqueue_result = Result("queue","enqueue",size_of_queue,time_span.count());
+    results.push_back(queue_enqueue_result.toString());
     //DELETE OPERATION
     t_start = high_resolution_clock::now();
     test_queue.dequeue();
     t_end = high_resolution_clock::now();
     time_span = duration_cast<duration<double>>(t_end - t_start);
-    this_restult = {"queue","dequeue",to_string(size_of_queue),to_string(time_span.count())};
-    results.push_back(this_restult);
+    Result queue_dequeue_result = Result("list","dequeue",size_of_queue,time_span.count());
+    results.push_back(queue_dequeue_result.toString());
     
 }
 
