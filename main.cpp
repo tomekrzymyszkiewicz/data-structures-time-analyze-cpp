@@ -26,14 +26,23 @@ struct Result{
     string operation;
     int size_of_strucutre;
     double time_span;
+    int averages_denominator;
+    Result(string data_structure, string operation, int size_of_strucutre, double time_span, int averages_denominator){
+        this->data_structure = data_structure;
+        this->operation = operation;
+        this->size_of_strucutre = size_of_strucutre;
+        this->time_span = time_span;
+        this->averages_denominator = averages_denominator;
+    }
     Result(string data_structure, string operation, int size_of_strucutre, double time_span){
         this->data_structure = data_structure;
         this->operation = operation;
         this->size_of_strucutre = size_of_strucutre;
         this->time_span = time_span;
+        this->averages_denominator = 1;
     }
     string toString(){
-        return(data_structure+","+operation+","+to_string(size_of_strucutre)+","+to_string(time_span));
+        return(data_structure+","+operation+","+to_string(size_of_strucutre)+","+to_string(time_span)+","+to_string(averages_denominator));
     }
 
 };
@@ -345,12 +354,127 @@ void save_results(string results_file_name){
     cout<<"Saving results"<<endl;
     fstream fout;
     fout.open(results_file_name,ios::out);
-    fout<<"data_structure,operation,size_of_structure,time_of_operation_s"<<endl;
+    fout<<"data_structure,operation,size_of_structure,time_of_operation_s,averages_denominator"<<endl;
     for(int i = 0; i < results.size(); i++){
         fout<<results[i]<<endl;
         //fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
     }
     cout<<"Correctly saved "<<results.size()<<" results"<<endl;
+}
+
+void array_create_operation(int size_of_array, int number_of_repeats){
+    using namespace std::chrono;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        int *test_array = new int[size_of_array];
+        for(int i = 0; i < size_of_array; i++){
+            test_array[i] = data_vector[i];
+        }
+        delete[] test_array;
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    Result array_create_result = Result("array","create",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    results.push_back(array_create_result.toString());
+}
+
+void array_put_operation(int size_of_array, int number_of_repeats){
+    using namespace std::chrono;
+    int *test_array = new int[size_of_array];
+    for(int i = 0; i < size_of_array; i++){
+        test_array[i] = data_vector[i];
+    }
+    int random_value = rand() % 1000000;
+    int random_index = rand() % size_of_array;
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        test_array[random_index] = random_value;
+    }
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    Result array_put_result = Result("array","put",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    results.push_back(array_put_result.toString());
+}
+
+void array_search_operation(int size_of_array, int number_of_repeats){
+    using namespace std::chrono;
+    int *test_array = new int[size_of_array];
+    for(int i = 0; i < size_of_array; i++){
+        test_array[i] = data_vector[i];
+    }
+    srand(time(NULL));
+    int random_index = rand() % size_of_array;
+    int searched_value = data_vector[random_index];
+    bool found = false;
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        for(int i = 0; i < size_of_array; i++){
+            if(test_array[i] == searched_value){
+                t_end = high_resolution_clock::now();
+                found = true;
+                break;
+            }
+        }
+        if(!found){
+            cout<<"Array searching error"<<endl;
+            t_end = high_resolution_clock::now();
+        }
+    }
+    duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
+    Result array_search_result = Result("array","search",size_of_array,time_span.count()/number_of_repeats,number_of_repeats);
+    results.push_back(array_search_result.toString());
+    delete[] test_array;
+}
+
+void array_delete_operation(int size_of_array, int number_of_repeats){
+    using namespace std::chrono;
+    duration<double> time_span = duration<double>(0);
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        int *test_array = new int[size_of_array];
+        for(int i = 0; i < size_of_array; i++){
+            test_array[i] = data_vector[i];
+        }
+        t_start = high_resolution_clock::now();
+        size_t temp_delete_array_size = size_of_array-1;
+        int *temp_delete_array = new int[temp_delete_array_size];
+        memcpy(temp_delete_array, test_array, temp_delete_array_size * sizeof(int));
+        delete[] test_array;
+        test_array = temp_delete_array;
+        t_end = high_resolution_clock::now();
+        time_span = time_span + duration_cast<duration<double>>(t_end - t_start);
+        delete[] temp_delete_array; 
+    }
+    Result array_delete_result = Result("array","delete",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    results.push_back(array_delete_result.toString());
+}
+
+void array_add_operation(int size_of_array, int number_of_repeats){
+    using namespace std::chrono;
+    duration<double> time_span = duration<double>(0);
+    high_resolution_clock::time_point t_start = high_resolution_clock::now();
+    high_resolution_clock::time_point t_end = high_resolution_clock::now();
+    for(int repeat = 0; repeat < number_of_repeats; repeat++){
+        int *test_array = new int[size_of_array];
+        for(int i = 0; i < size_of_array; i++){
+            test_array[i] = data_vector[i];
+        }
+        int random_value = rand() % 1000000;
+        t_start = high_resolution_clock::now();
+        size_t temp_add_array_size = size_of_array+1;
+        int *temp_add_array = new int[temp_add_array_size];
+        memcpy(temp_add_array, test_array, size_of_array * sizeof(int));
+        temp_add_array[size_of_array] = random_value;
+        delete[] test_array;
+        test_array = temp_add_array;
+        t_end = high_resolution_clock::now();
+        time_span += duration_cast<duration<double>>(t_end - t_start);
+        delete[] temp_add_array;
+    }
+    Result array_add_result = Result("array","add",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    results.push_back(array_add_result.toString());
 }
 
 void array_operations(int size_of_array){
@@ -388,7 +512,7 @@ void array_operations(int size_of_array){
     //PUT OPERATION
     random_index = rand() % size_of_array;
     t_start = high_resolution_clock::now();
-    test_array[random_index] = 0;
+    test_array[random_index] = random_index;
     t_end = high_resolution_clock::now();
     test_array[random_index] = data_vector[random_index];
     time_span = duration_cast<duration<double>>(t_end - t_start);
@@ -620,11 +744,19 @@ int main(){
         else{
             if(tasks[i][0] == "array"){
                 for(int j = start_range; j <= end_range; j += step){
-                    for(int k = 0; k < time_repeat; k++){
-                        cout<<"Array operations with "<<j<<" elements ";
-                        array_operations(j);
-                        cout<<"done"<<endl;
-                    }
+                    // for(int k = 0; k < time_repeat; k++){
+                    //     cout<<"Array operations with "<<j<<" elements ";
+                    //     //array_operations(j);
+                    //     array_create_operation(j,time_repeat);
+                    //     cout<<"done"<<endl;
+                    // }
+                    cout<<"Array operations with "<<j<<" elements ";
+                    array_create_operation(j,time_repeat);
+                    array_search_operation(j,time_repeat);
+                    array_put_operation(j,time_repeat);
+                    array_delete_operation(j,time_repeat);
+                    array_add_operation(j,time_repeat);
+                    cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "list"){
