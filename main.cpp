@@ -374,7 +374,7 @@ void array_create_operation(int size_of_array, int number_of_repeats){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    Result array_create_result = Result("array","create",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    Result array_create_result = Result("array","create",size_of_array,time_span.count(),number_of_repeats);
     results.push_back(array_create_result.toString());
 }
 
@@ -392,7 +392,7 @@ void array_put_operation(int size_of_array, int number_of_repeats){
     }
     high_resolution_clock::time_point t_end = high_resolution_clock::now();
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    Result array_put_result = Result("array","put",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    Result array_put_result = Result("array","put",size_of_array,time_span.count(),number_of_repeats);
     results.push_back(array_put_result.toString());
 }
 
@@ -422,7 +422,7 @@ void array_search_operation(int size_of_array, int number_of_repeats){
         }
     }
     duration<double> time_span = duration_cast<duration<double>>(t_end - t_start);
-    Result array_search_result = Result("array","search",size_of_array,time_span.count()/number_of_repeats,number_of_repeats);
+    Result array_search_result = Result("array","search",size_of_array,time_span.count(),number_of_repeats);
     results.push_back(array_search_result.toString());
     delete[] test_array;
 }
@@ -447,7 +447,7 @@ void array_delete_operation(int size_of_array, int number_of_repeats){
         time_span = time_span + duration_cast<duration<double>>(t_end - t_start);
         delete[] temp_delete_array; 
     }
-    Result array_delete_result = Result("array","delete",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    Result array_delete_result = Result("array","delete",size_of_array,time_span.count(),number_of_repeats);
     results.push_back(array_delete_result.toString());
 }
 
@@ -473,7 +473,7 @@ void array_add_operation(int size_of_array, int number_of_repeats){
         time_span += duration_cast<duration<double>>(t_end - t_start);
         delete[] temp_add_array;
     }
-    Result array_add_result = Result("array","add",size_of_array,time_span.count()/(double)number_of_repeats,number_of_repeats);
+    Result array_add_result = Result("array","add",size_of_array,time_span.count(),number_of_repeats);
     results.push_back(array_add_result.toString());
 }
 
@@ -751,11 +751,11 @@ int main(){
                     //     cout<<"done"<<endl;
                     // }
                     cout<<"Array operations with "<<j<<" elements ";
-                    array_create_operation(j,time_repeat);
-                    array_search_operation(j,time_repeat);
+                    //array_create_operation(j,time_repeat);
+                    //array_search_operation(j,time_repeat);
                     array_put_operation(j,time_repeat);
-                    array_delete_operation(j,time_repeat);
-                    array_add_operation(j,time_repeat);
+                    //array_delete_operation(j,time_repeat);
+                    //array_add_operation(j,time_repeat);
                     cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
