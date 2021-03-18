@@ -17,6 +17,37 @@ Set properties in configuration file:
 - enter a series of task to test by the program
 ---
 
+## Data structures and allowed operations
+
+Array:
+
+- create
+- search
+- add
+- delete
+- put
+
+Stack: 
+- create
+- search
+- push
+- pop
+- put
+
+Queue:
+- create
+- search
+- enqueue
+- dequeue
+  
+List:
+- create
+- search
+- add
+- delete
+
+---
+
 ## config.ini syntax
 
 ```
@@ -30,18 +61,27 @@ Set properties in configuration file:
 ```
 Task syntax
 ```
-<structure>, <range start value (min. 1)>, <range stop value>, <step value>, <number of repeat>
+<structure>,<opeation> ,<range start value (min. 1)>, <range stop value>, <step value>, <number of repeat>
 ```
 
 Example config.ini
 ```
 data.csv 1000000
 results.csv
-array 1 1000 2 10 
-stack 5 200 5 1
-list 1 100000 100 20
-queue 10 10000 10 1
+array create 1 1000 2 10 
+stack push 5 200 5 1
+list search 1 100000 100 20
+queue enueue 10 10000 10 1
 ```
 Run the program and read the current information.
 
 Then you are able to load results and analyze them (e.g. in Excel).
+
+---
+## Results
+After taking the measurements, the program saves the results in the following format
+
+```
+<data_structure>,<operation>,<size_of_structure>,<time_of_operation_s>,<averages_denominator>
+```
+
