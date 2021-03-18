@@ -322,13 +322,14 @@ bool load_config(){
     fin >> data_file_name >> data_amount;
     fin >> results_file_name;
     while(!fin.eof()){
-        string structure, start_range, end_range, step, time;
-        fin>>structure>>start_range>>end_range>>step>>time;
-        if(structure.size() == 0 || start_range.size() == 0 || end_range.size() == 0 || step.size() == 0 || time.size() == 0){
+        string structure, operation, start_range, end_range, step, time;
+        fin>>structure>>operation>>start_range>>end_range>>step>>time;
+        if(structure.size() == 0 || operation.size() == 0 || start_range.size() == 0 || end_range.size() == 0 || step.size() == 0 || time.size() == 0){
             break;
         }
         vector<string> task;
         task.push_back(structure);
+        task.push_back(operation);
         task.push_back(start_range);
         task.push_back(end_range);
         task.push_back(step);
@@ -1038,75 +1039,88 @@ int main(){
         load_data(data_file_name,data_amount);
     }
     for(int i = 0;i < tasks.size(); i++){
-        int start_range = stoi(tasks[i][1]);
-        int end_range = stoi(tasks[i][2]);
-        int step = stoi(tasks[i][3]);
-        int time_repeat = stoi(tasks[i][4]);
-        cout<<"Task on "<<tasks[i][0]<<" in range from "<<start_range<<" to "<<end_range<<" with step "<<step<<" made "<<time_repeat<<" times"<<endl;
+        string structure = tasks[i][0];
+        string operation = tasks[i][1]; 
+        int start_range = stoi(tasks[i][2]);
+        int end_range = stoi(tasks[i][3]);
+        int step = stoi(tasks[i][4]);
+        int time_repeat = stoi(tasks[i][5]);
+        cout<<"Task "<<operation<<" on "<<structure<<" in range from "<<start_range<<" to "<<end_range<<" with step "<<step<<" made "<<time_repeat<<" times"<<endl;
         if(start_range<1||end_range>data_vector.size()||time_repeat < 1){
             cout<<"Cannot execute task in this range"<<endl;
         }
         else{
             if(tasks[i][0] == "array"){
                 for(int j = start_range; j <= end_range; j += step){
-                    // for(int k = 0; k < time_repeat; k++){
-                    //     cout<<"Array operations with "<<j<<" elements ";
-                    //     //array_operations(j);
-                    //     array_create_operation(j,time_repeat);
-                    //     cout<<"done"<<endl;
-                    // }
-                    cout<<"Array operations with "<<j<<" elements ";
-                    array_create_operation(j,time_repeat);
-                    array_search_operation(j,time_repeat);
-                    array_put_operation(j,time_repeat);
-                    array_delete_operation(j,time_repeat);
-                    array_add_operation(j,time_repeat);
+                    cout<<"Array operation "<<operation<<" with "<<j<<" elements ";
+                    if(operation == "create"){
+                        array_create_operation(j,time_repeat);
+                    }else if(operation == "search"){
+                        array_search_operation(j,time_repeat);
+                    }else if(operation == "put"){
+                        array_put_operation(j,time_repeat);
+                    }else if(operation == "delete"){
+                        array_delete_operation(j,time_repeat);
+                    }else if(operation == "add"){
+                        array_add_operation(j,time_repeat);
+                    }else{
+                        cout<<endl<<"Operation not recognized"<<endl;
+                    }
                     cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "list"){
                 for(int j = start_range; j <= end_range; j += step){
-                    // for(int k = 0; k < time_repeat; k++){
-                    //     cout<<"List operations with "<<j<<" elements ";
-                    //     list_operations(j);
-                    //     cout<<"done"<<endl;
-                    // }
-                    cout<<"List operations with "<<j<<" elements ";
-                    list_create_operation(j,time_repeat);
-                    list_search_operation(j,time_repeat);
-                    list_delete_operation(j,time_repeat);
-                    list_add_operation(j,time_repeat);
+                    cout<<"List operation "<<operation<<" with "<<j<<" elements ";
+                    if(operation == "create"){
+                        list_create_operation(j,time_repeat);
+                    }else if(operation == "search"){
+                        list_search_operation(j,time_repeat);
+
+                    }else if(operation == "delete"){
+                        list_delete_operation(j,time_repeat);
+
+                    }else if(operation == "add"){
+                        list_add_operation(j,time_repeat);
+                    }else{
+                        cout<<endl<<"Operation not recognized"<<endl;
+                    }
                     cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "stack"){
                 for(int j = start_range; j <= end_range; j += step){
-                    // for(int k = 0; k < time_repeat; k++){
-                    //     cout<<"Stack operations with "<<j<<" elements ";
-                    //     stack_operations(j);
-                    //     cout<<"done"<<endl;
-                    // }
-                    cout<<"Stack operations with "<<j<<" elements ";
-                    stack_create_operation(j,time_repeat);
-                    stack_search_operation(j,time_repeat);
-                    stack_put_operation(j,time_repeat);
-                    stack_pop_operation(j,time_repeat);
-                    stack_push_operation(j,time_repeat);
+                    cout<<"Stack operation "<<operation<<" with "<<j<<" elements ";
+                    if(operation == "create"){
+                        stack_create_operation(j,time_repeat);
+                    }else if(operation == "search"){
+                        stack_search_operation(j,time_repeat);
+                    }else if(operation == "put"){
+                        stack_put_operation(j,time_repeat);
+                    }else if(operation == "pop"){
+                        stack_pop_operation(j,time_repeat);
+                    }else if(operation == "push"){
+                        stack_push_operation(j,time_repeat);
+                    }else{
+                        cout<<endl<<"Operation not recognized"<<endl;
+                    }
                     cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
             }else if(tasks[i][0] == "queue"){
                 for(int j = start_range; j <= end_range; j += step){
-                    // for(int k = 0; k < time_repeat; k++){
-                    //     cout<<"Queue operations with "<<j<<" elements ";
-                    //     queue_operations(j);
-                    //     cout<<"done"<<endl;
-                    // }
-                    cout<<"Queue operations with "<<j<<" elements ";
-                    queue_create_operation(j,time_repeat);
-                    queue_search_operation(j,time_repeat);
-                    queue_enqueue_operation(j,time_repeat);
-                    queue_dequeue_operation(j,time_repeat);
+                    cout<<"Queue operation "<<operation<<" with "<<j<<" elements ";
+                    if(operation == "create"){
+                        queue_create_operation(j,time_repeat);
+                    }else if(operation == "search"){
+                        queue_search_operation(j,time_repeat);
+                    }else if(operation == "queue"){
+                        queue_enqueue_operation(j,time_repeat);
+                    }else if(operation == "dequeue"){
+                        queue_dequeue_operation(j,time_repeat);
+                    }else{
+                        cout<<endl<<"Operation not recognized"<<endl;
+                    }
                     cout<<"done"<<endl;
                 }
                 cout<<"Task done"<<endl;
