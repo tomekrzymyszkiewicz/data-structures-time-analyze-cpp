@@ -61,7 +61,7 @@ List:
 ```
 Task syntax
 ```
-<structure>,<opeation> ,<range start value (min. 1)>, <range stop value>, <step value>, <number of repeat>
+<structure>,<operation> ,<range start value (min. 1)>, <range stop value>, <step value>, <number of repeat>
 ```
 
 Example config.ini
@@ -71,7 +71,7 @@ results.csv
 array create 1 1000 2 10 
 stack push 5 200 5 1
 list search 1 100000 100 20
-queue enueue 10 10000 10 1
+queue enqueue 10 10000 10 1
 ```
 Run the program and read the current information.
 
