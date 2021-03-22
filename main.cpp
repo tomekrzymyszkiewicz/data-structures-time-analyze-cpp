@@ -275,13 +275,15 @@ int rear(Queue* queue)
 void generate_data(string file_name,int amount){
     cout<<"Generating "<<amount<<" numbers to data file "<<file_name<<endl;
     fstream fout;
-    fout.open("data.csv",ios::out);
+    fout.open(file_name,ios::out);
     random_device rd;
     mt19937 gen(rd());
     uniform_int_distribution<> dis(-1000000, 1000000);
     for(int i = 0; i < amount; i++){
-        fout<<dis(gen)<<"\n";
+        int generated_number =  dis(gen);
+        fout<<generated_number<<"\n";
     }
+    fout.close();
     cout<<"Data generated correctly"<<endl;
 }
 
@@ -291,6 +293,7 @@ bool load_data(string file_name, int amount){
     fin.open(file_name,ios::in);
     if(fin.fail()){
         cout<<"Data file "<<file_name<<" not exist"<<endl;
+        fin.close();
         return false;
     }
     string line;
@@ -306,6 +309,7 @@ bool load_data(string file_name, int amount){
         data_loaded++;
     }
     cout<<"Loaded correctly "<<data_loaded<<" numbers"<<endl;
+    fin.close();
     return true;
 }
 
@@ -315,6 +319,7 @@ bool load_config(){
     fin.open("config.ini",ios::in);
     if(fin.fail()){
         cout<<"Config.ini not found"<<endl;
+        fin.close();
         return false;
     }
     vector<string> row;
@@ -336,6 +341,7 @@ bool load_config(){
         task.push_back(time);
         tasks.push_back(task);
     }
+    fin.close();
     cout<<"Config loaded correctly"<<endl;
     return true;
 }
@@ -355,12 +361,14 @@ void save_results(string results_file_name){
     cout<<"Saving results"<<endl;
     fstream fout;
     fout.open(results_file_name,ios::out);
-    fout<<"data_structure,operation,size_of_structure,time_of_operation_s,averages_denominator"<<endl;
+    fout<<"data_structure,operation,size_of_structure,time_of_operation_s,number_of_repetitions"<<endl;
     for(int i = 0; i < results.size(); i++){
         fout<<results[i]<<endl;
         //fout<<results[i][0]<<","<<results[i][1]<<","<<results[i][2]<<","<<results[i][3]<<endl;
     }
+    fout.close();
     cout<<"Correctly saved "<<results.size()<<" results"<<endl;
+
 }
 
 void array_create_operation(int size_of_array, int number_of_repeats){
@@ -607,7 +615,6 @@ void stack_put_operation(int size_of_stack, int number_of_repeats){
     results.push_back(stack_pop_result.toString());
 }
 
-
 void list_create_operation(int size_of_list, int number_of_repeats){
     using namespace std::chrono;
     high_resolution_clock::time_point t_start = high_resolution_clock::now();
@@ -639,9 +646,10 @@ void list_search_operation(int size_of_list, int number_of_repeats){
         t_start = high_resolution_clock::now();
         if(!test_list.find(searched_value)){    //szukaj elementu searched_value w liście
             cout<<" find error ";
+        }
         t_end = high_resolution_clock::now();
         time_span += duration_cast<duration<double>>(t_end - t_start);
-        }
+        cout<<"time: "<<time_span.count()<<endl;
     }
     Result list_search_result = Result("list","search",size_of_list,time_span.count(),number_of_repeats);
     results.push_back(list_search_result.toString());
