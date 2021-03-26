@@ -597,15 +597,15 @@ void stack_put_operation(int size_of_stack, int number_of_repeats){
         for(int i = 0; i < size_of_stack; i++){
             test_stack.push(data_vector[i]);
         }
-        int random_deep = rand() % size_of_stack;
+        int test_deep = size_of_stack/2;
         int random_value = rand() % 1000000;
         t_start = high_resolution_clock::now();
         Stack temp_put_stack = Stack();             //utwórz stos tymczasowy
-        for(int i = 0; i < random_deep; i++){       //powtarzaj glebokosc_stosu razy
+        for(int i = 0; i < test_deep; i++){       //powtarzaj glebokosc_stosu razy
             temp_put_stack.push(test_stack.pop());  //zdejmij element ze stosu i wstaw do stosu tymczasowego
         }
         test_stack.push(random_value);              //wstaw element na stos
-        for(int i = 0; i < random_deep; i++){       //powtarzaj glebokosc_stosu razy
+        for(int i = 0; i < test_deep; i++){       //powtarzaj glebokosc_stosu razy
             test_stack.push(temp_put_stack.pop());  //zdejmij element ze stosu tymczasowego i wstaw do stosu 
         }
         t_end = high_resolution_clock::now();
@@ -649,7 +649,6 @@ void list_search_operation(int size_of_list, int number_of_repeats){
         }
         t_end = high_resolution_clock::now();
         time_span += duration_cast<duration<double>>(t_end - t_start);
-        cout<<"time: "<<time_span.count()<<endl;
     }
     Result list_search_result = Result("list","search",size_of_list,time_span.count(),number_of_repeats);
     results.push_back(list_search_result.toString());
@@ -749,6 +748,9 @@ void queue_search_operation(int size_of_queue, int number_of_repeats){
         }
         t_end = high_resolution_clock::now();
         time_span += duration_cast<duration<double>>(t_end - t_start);
+        deleteQueue(test_queue);
+        deleteQueue(temp_search_queue);
+
     }
     Result queue_search_result = Result("queue","search",size_of_queue,time_span.count(),number_of_repeats);
     results.push_back(queue_search_result.toString());
@@ -770,6 +772,7 @@ void queue_enqueue_operation(int size_of_queue, int number_of_repeats){
         enqueue(test_queue,random_value); //dodaj element do kolejki
         t_end = high_resolution_clock::now();
         time_span += duration_cast<duration<double>>(t_end - t_start);
+        deleteQueue(test_queue);
     }
     Result queue_enqueue_result = Result("queue","enqueue",size_of_queue,time_span.count(),number_of_repeats);
     results.push_back(queue_enqueue_result.toString());
@@ -789,6 +792,7 @@ void queue_dequeue_operation(int size_of_queue, int number_of_repeats){
         dequeue(test_queue);                    //usun element z kolejki
         t_end = high_resolution_clock::now();
         time_span += duration_cast<duration<double>>(t_end - t_start);
+        deleteQueue(test_queue);
     }
     Result queue_dequeue_result = Result("queue","dequeue",size_of_queue,time_span.count(),number_of_repeats);
     results.push_back(queue_dequeue_result.toString());
@@ -876,7 +880,7 @@ int main(){
                         queue_create_operation(j,time_repeat);
                     }else if(operation == "search"){
                         queue_search_operation(j,time_repeat);
-                    }else if(operation == "queue"){
+                    }else if(operation == "enqueue"){
                         queue_enqueue_operation(j,time_repeat);
                     }else if(operation == "dequeue"){
                         queue_dequeue_operation(j,time_repeat);
